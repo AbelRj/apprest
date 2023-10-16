@@ -1,0 +1,7 @@
+{
+  "name": "apprest",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
