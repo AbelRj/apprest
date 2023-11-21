@@ -1,7 +1,8 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ProductService } from '../services/product.service';
+import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
+import { ProductService } from '../product.service';
 import { Subscription, tap } from 'rxjs';
 import { NavController } from '@ionic/angular';
+import { AuthService } from 'src/app/auth/user.service';
 
 
 @Component({
@@ -10,14 +11,22 @@ import { NavController } from '@ionic/angular';
   styleUrls: ['./inicio.page.scss'],
 })
 export class InicioPage implements OnInit, OnDestroy {
-
+  isLogged = this.authSvc.isLogged;
+  @Output() toogleSidenav = new EventEmitter<void>();
   private _Subscription: Subscription = new Subscription();
   products: any[] = [];
   constructor(
     private _productSvc: ProductService,
-    public navCtrl: NavController) {
+    public navCtrl: NavController,
+    private authSvc: AuthService,) {
   }
-
+  onToggleSidenav(){
+    this.toogleSidenav.emit();
+    }
+    
+    onLogout(): void {
+      this.authSvc.logout();
+    }
   ngOnInit() {
     this.getAllProducts();
   }
@@ -27,7 +36,7 @@ export class InicioPage implements OnInit, OnDestroy {
   }
   public getAllProducts() {
     this._Subscription.add(
-      this._productSvc.getProducts().pipe(
+      this._productSvc.getAllProducts().pipe(
         tap(res => this.products = res)
       ).subscribe()
     )

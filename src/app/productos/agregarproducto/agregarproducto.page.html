@@ -1,0 +1,65 @@
+<ion-header >
+  <ion-toolbar color="primary">
+    <ion-title>Agregar Producto</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/inicio"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <form [formGroup]="form" (ngSubmit)="addProduct()">
+    <ion-item>
+      <ion-label position="floating">Nombre del Producto</ion-label>
+      <ion-input
+        formControlName="name"
+        placeholder="Nombre del Producto"
+        type="text"
+        required
+        [class]="isValidField('name')"
+      ></ion-input>
+    </ion-item>
+    
+
+    <ion-item>
+      <ion-label position="floating">Precio</ion-label>
+      <ion-input
+        formControlName="price"
+        placeholder="123.45"
+        type="number"
+        required
+        [class]="isValidField('price')"
+      ></ion-input>
+    </ion-item>
+   
+
+    <ion-item>
+      <ion-label>Categorías</ion-label>
+      <ion-select
+        formControlName="categories"
+        placeholder="Seleccionar Categoría"
+        multiple
+        cancelText="Cancelar"
+        okText="OK"
+      >
+        <ion-select-option [value]="item.id" *ngFor="let item of category">
+          {{ item.name }}
+        </ion-select-option>
+      </ion-select>
+    </ion-item>
+  
+
+    <ion-row>
+      <ion-col>
+        <ion-button
+          expand="full"
+          type="submit"
+          color="primary"
+          [disabled]="form.invalid"
+        >
+          Guardar
+        </ion-button>
+      </ion-col>
+    </ion-row>
+  </form>
+</ion-content>

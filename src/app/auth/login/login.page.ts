@@ -7,6 +7,8 @@ import {
 } from '@angular/forms';
 import { AlertController } from '@ionic/angular';
 import { NavController } from '@ionic/angular';
+import { AuthService } from '../user.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -14,23 +16,29 @@ import { NavController } from '@ionic/angular';
   styleUrls: ['./login.page.scss'],
 })
 export class LoginPage implements OnInit {
+  hide: boolean = true;
 
+  togglePasswordVisibility() {
+    this.hide = !this.hide;
+  }
   formularioLogin: FormGroup;
 
   constructor(public fb: FormBuilder,
     public alertController: AlertController,
-    public navCtrl: NavController) { 
+    public navCtrl: NavController,
+    private authSvc: AuthService,
+    private router: Router) { 
 
     this.formularioLogin = this.fb.group({
-      nombre: new FormControl("",Validators.required),
-      password: new FormControl("",Validators.required)
+      username: new FormControl("", [Validators.required, Validators.email]),
+      password: new FormControl("", Validators.required)
     })
 
   }
 
   ngOnInit() {
   }
-
+/*
   async ingresar() {
     var f = this.formularioLogin.value;
   
@@ -56,8 +64,28 @@ export class LoginPage implements OnInit {
     } 
     //console.log(usuarioString);
   }
-  
-  
+  */
+  onLogin(){
+    console.log(this.formularioLogin.value);
+    const formValue = this.formularioLogin.value;
+    this.authSvc.login(formValue).subscribe(
+      user=>{
+        console.log(user);
+        if(user){
+          this.router.navigate(['/inicio']);
+        }
+        else{
+          this.router.navigate(['/login']);
+        }
+      }
+    )
+  }
+
+  isValidField(field: string):string{
+    const validatedField = this.formularioLogin.get(field);
+    return (!validatedField?.valid && validatedField?.touched)
+      ? 'is-invalid' : validatedField?.touched ? 'is-valid' : '';
+  }
   
 
 }

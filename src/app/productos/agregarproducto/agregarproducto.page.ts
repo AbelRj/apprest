@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { ProductService } from '../services/product.service';
+import { ProductService } from '../product.service';
 import { Subscription, from, tap } from 'rxjs';
 import { NavController } from '@ionic/angular';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import {InicioPage } from '../inicio/InicioPage';
+import { CategoryI } from '../product';
 
 @Component({
   selector: 'app-agregarproducto',
@@ -11,22 +12,28 @@ import {InicioPage } from '../inicio/InicioPage';
   styleUrls: ['./agregarproducto.page.scss'],
 })
 export class AgregarproductoPage implements OnInit {
-  formularioAddProduct: FormGroup;
+  category:CategoryI[]=[];
+  form: FormGroup;
   private _Subscription: Subscription = new Subscription();
 
   constructor(private _productSvc: ProductService,
     public navCtrl: NavController,
     public fb:FormBuilder) {
-      this.formularioAddProduct = this.fb.group({
-        nombre: new FormControl('', Validators.required),
-        descripcion: new FormControl('', Validators.required),
-        precio: new FormControl('', Validators.required)
-       
-      })
+      this.form = this.fb.group({
+        name:["",[Validators.required]],
+        price:["",[Validators.required]],
+        categories:[]
+      });
      }
 
   ngOnInit() {
-    
+    this.getCategories();
+  }
+  getCategories(): void{
+    this._productSvc.getAllCategories().subscribe((categories: CategoryI[])=>{
+      this.category = categories;
+      console.log('category', this.category);
+    });
   }
 
   ngOnDestroy(): void {
@@ -34,7 +41,25 @@ export class AgregarproductoPage implements OnInit {
   }
 
  
-
+addProduct(){
+  console.log('hola')
+  if(this.form.invalid){
+    return;
+  }
+  const product = this.form.value;
+  this._Subscription.add(
+    this._productSvc.newProduct(product).pipe(
+      tap( () =>InicioPage.prototype.getAllProducts() )
+    ).subscribe()
+  )
+  this.navCtrl.navigateRoot('inicio');
+}
+isValidField(field: string):string{
+  const validatedField = this.form.get(field);
+  return (!validatedField?.valid && validatedField?.touched)
+    ? 'is-invalid' : validatedField?.touched ? 'is-valid' : '';
+}
+/*
   guardarProduct(){
     if(this.formularioAddProduct.invalid){
       return;
@@ -47,7 +72,9 @@ export class AgregarproductoPage implements OnInit {
         description: descripcion,
         price: precio
       };
-      
+
+      */
+      /*
     console.log(product);
     this._Subscription.add(
       this._productSvc.postProduct(product).pipe(
@@ -55,7 +82,7 @@ export class AgregarproductoPage implements OnInit {
       ).subscribe()
     )
     this.navCtrl.navigateRoot('inicio');
- 
+ */
   }
  /* 
   addProduct() {
@@ -70,4 +97,4 @@ export class AgregarproductoPage implements OnInit {
     ).subscribe()
   }
  */
-}
+
